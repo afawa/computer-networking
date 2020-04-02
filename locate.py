@@ -4,7 +4,7 @@ import sympy
 import numpy as np 
 import itertools
 
-RSSI_threshold = 75
+RSSI_threshold = 90
 
 
 def distance_to_BS(rssi, a=42, n=3.3):
@@ -26,27 +26,32 @@ def locate_by_pointlist(point_list: list):
     """
     x = 0
     y = 0
-    for p in point_list:
+    temp_list = point_list.copy()
+    for p in temp_list:
         if p[2] is None:
             point_list.remove(p)
+    temp_list=point_list.copy()
     num = len(point_list)
-    temp_list = point_list.copy()
-    for p1 in point_list:
-        temp_list.remove(p1)
-        for p2 in temp_list:
-            p2p = distance(p1, p2)
-            dist_sum = p1[2] + p2[2]
-            if dist_sum <= p2p:
-                x += p1[0] + (p2[0] - p1[0])*p1[2] / dist_sum
-                y += p1[1] + (p2[1] - p1[1])*p1[2] / dist_sum
-            else:
-                dr = p2p / 2 + (p1[2]**2 - p2[2]**2) / (2 * p2p)
-                x += p1[0] + (p2[0] - p1[0])*dr / p2p
-                y += p1[1] + (p2[1] - p1[1])*dr / p2p
-    x /= num
-    y /= num
-    # x /= (num*(num-1))/2
-    # x /= (num*(num-1))/2
+    if num==2:
+        for p1 in point_list:
+            temp_list.remove(p1)
+            for p2 in temp_list:
+                p2p = distance(p1, p2)
+                dist_sum = p1[2] + p2[2]
+                if dist_sum <= p2p:
+                    x += p1[0] + (p2[0] - p1[0]) * p1[2] / dist_sum
+                    y += p1[1] + (p2[1] - p1[1]) * p1[2] / dist_sum
+                else:
+                    dr = p2p / 2 + (p1[2] ** 2 - p2[2] ** 2) / (2 * p2p)
+                    x += p1[0] + (p2[0] - p1[0]) * dr / p2p
+                    y += p1[1] + (p2[1] - p1[1]) * dr / p2p
+        x /= (num * (num - 1)) / 2
+        y /= (num * (num - 1)) / 2
+    elif num==1:
+        x = point_list[0][0]
+        y = point_list[0][1]
+    elif num >=3:
+        x, y = three_point(point_list)
     return x, y
 
 
@@ -54,9 +59,6 @@ def distance(p1, p2):
     return sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
 def three_point(point_list: list):
-    for p in point_list:
-        if p[2] is None:
-            point_list.remove(p)
     num=0
     x=0
     y=0
