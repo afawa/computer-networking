@@ -2,12 +2,14 @@ import xlrd
 import xlwt
 import datetime
 import matplotlib.pyplot as plt
+import matplotlib.image as img
 from locate import distance_to_BS, locate_by_pointlist,distance
 import sys
 import pandas as pd
 import csv
 import pprint
 import math
+import random
 
 gateway = [[], [22, 6.41], [22.62, 22.59], [41, 17.4], [31.875, 2.29], [8.35, 22.59]]
 checkpoint =[[],[39.145,17.124],[],[],[],[],[6.151,3.314],[],[],[],[8.947,19.886],[15.658,20.162],[24.326,20.162]]
@@ -66,6 +68,33 @@ def lsm(logs):
     plt.show()
     #return 54,4
     return a,n
+
+def plot_img(output):
+    truthX = []
+    truthY = []
+    myX = []
+    myY = []
+    '''
+    for item in raw_gd:
+        truthX.append(checkpoint[item[1]][0])
+        truthY.append(checkpoint[item[1]][1])
+    '''
+    for i in output:
+        if i[2] in gd:
+            x=gd[i[2]][0]
+            y=gd[i[2]][1]
+            truthX.append(x)
+            truthY.append(y)
+            myX.append(i[0])
+            myY.append(i[1])
+    print(truthX)
+    print(truthY)
+    ax = plt.axes(xlim=(0, 42.5), ylim=(0, 29))
+    imgP = plt.imread('./data/bkg data/map.png')
+    ax.imshow(imgP, zorder=0, extent=[0, 42.5, 0.0, 29])  # 背景图片
+    ax.scatter(truthX,truthY, marker='+', s=150, c='r')
+    ax.scatter(myX, myY, marker='*', s=150, c='b')
+    plt.show()
 
 def calculate_error(output):
     ret=0
@@ -165,6 +194,9 @@ def eliminate_duplicates(temp_l):
         result.append([key, sum(value)/len(value)])  # 消除重复的策略可改，这里定的是均值
     return result
 
+#def plot_image():
+    datList = []
+#    datMat = mat(datList)
 
 if __name__ == "__main__":
     path =['./data/bkg data/03-28-Abeacon3.csv','./data/bkg data/03-28-mi.csv']
@@ -196,4 +228,5 @@ if __name__ == "__main__":
             i += 1
     print(len(output))
     calculate_error(output)
+    plot_img(output)
     wb.save(result_path)
