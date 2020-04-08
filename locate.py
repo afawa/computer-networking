@@ -4,7 +4,7 @@ import sympy
 import numpy as np 
 import itertools
 
-RSSI_threshold = 90
+RSSI_threshold = 85
 
 
 def distance_to_BS(rssi, a=42, n=3.3):
@@ -32,7 +32,7 @@ def locate_by_pointlist(point_list: list):
             point_list.remove(p)
     temp_list=point_list.copy()
     num = len(point_list)
-    if num==2:
+    if num>=2:
         for p1 in point_list:
             temp_list.remove(p1)
             for p2 in temp_list:
@@ -76,9 +76,9 @@ def triposition(xa,ya,da,xb,yb,db,xc,yc,dc):
     x,y = sympy.symbols('x y')
     f1 = 2*x*(xa-xc)+np.square(xc)-np.square(xa)+2*y*(ya-yc)+np.square(yc)-np.square(ya)-(np.square(dc)-np.square(da))
     f2 = 2*x*(xb-xc)+np.square(xc)-np.square(xb)+2*y*(yb-yc)+np.square(yc)-np.square(yb)-(np.square(dc)-np.square(db))
-    result = sympy.solve([f1,f2],[x,y])
-    locx,locy = result[x],result[y]
-    return [locx,locy]
+    result=sympy.solve([f1,f2],[x,y])
+    locx, locy = result[x], result[y]
+    return [locx, locy]
 
 def err(x,y,gt):
     return sqrt((x-gt[0])**2+(y-gt[1])**2)
