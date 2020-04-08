@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html> 
+  <head> 
+        <meta charset="utf-8"> 
+        <title>HelloWorld</title> 
+        <style>
+        #map{
+            background-image:url("../data/bkg data/map.png");
+            background-size: cover;
+            width:637.5px;
+            height:435px;
+        }
+    </style>
+  </head> 
+    <body> 
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> 
+        <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+        <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+        <script src="http://d3js.org/d3.v4.0.0-alpha.44.min.js"></script>
+        <script>  
+            function queryGateways() {
+                let gateways = 
+                    [{x:22, y:6.41}, {x:22.62, y:22.59}, {x:41, y:17.4}, 
+                    {x:31.875, y:2.29}, {x:8.35, y:22.59}, {x:8.15, y:3.31}];
+
+                let width=637.5
+                let height=435
+                d3.select("svg").remove()
+                let svg = d3.select("#map")
+                            .append("svg")
+                            .attr("width", width)
+                            .attr("height", height)
+
+                const colorMap = d3.interpolateRgb(
+                                  d3.rgb('#7CFC00'),
+                                  d3.rgb('#800000')
+                                )
+
+                var request = new Request('http://localhost:8010/proxy/api/gateways');
+                fetch(request,{mode: 'cors'})
+                    .then(function(response) {
+                      res=response.json();
+                      res.then(
+                        data=>{
+                            for (let i = 0; i < data.length; i++) { 
+                                gateways[i].number=data[i].connections;
+                             }
+                             let circles = svg.selectAll(".MyCircle")
+                                    .data(gateways)
+                                    .enter()
+                                    .append("circle")
+                                    .attr("class","MyCircle")
+                                    .attr("cx", function(d){
+                                        return d.x*15;
+                                    } )
+                                    .attr("cy",function(d){
+                                        return height-d.y*15;
+                                    })
+                                    .attr("fill", (d)=> {
+                                        return colorMap(d.number)
+                                    })
+                                    .attr("r","8");
+                        });
+                    }).catch(function(error) {  
+                      console.log('Request failed', error)  
+                    });
+            }
+
+            function queryDevices(){
+                let url="http://localhost:8010/proxy/api/devices/"+document.getElementById("macAddr").value+"/traces?start_time=2020-04-07%2012:25:00&end_time=2020-04-07%2013:45:00";
+                var request = new Request(url);
+                fetch(request,{mode: 'cors'})
+                    .then(function(response) {
+                      res=response.json();
+                      res.then(
+                        data=>{
+                            let points=[]
+                            for (let i = 0; i < data.length; i++) { 
+                                if(data[i].x>0.1&&data[i].y>0.1)
+                                    points.push({x:data[i].x*15,y:data[i].y*15});
+                            }
+                    
+                            //points=[{x:22*15, y:6.41*15}, {x:22.62*15, y:22.59*15}, {x:41*15, y:17.4*15}];
+
+                            let width=637.5
+                            let height=435
+                            d3.select("svg").remove()
+                            let svg = d3.select("#map")
+                                        .append("svg")
+                                        .attr("width", width)
+                                        .attr("height", height)
+                            const line = d3.line()
+                                  .x((d)=> d.x)
+                                  .y((d)=> height - d.y)
+                                  //.curve(d3.curveLinear)
+                                  .curve(d3.curveNatural)
+                            console.log(points)
+                            d3.select('svg')
+                              .append("path")
+                              .attr('d', line(points))
+                              .attr('fill', 'none')
+                              .attr('stroke-width',2)
+                              .attr('stroke', 'green');
+                    }).catch(function(error) {  
+                      console.log('Request failed', error)  
+                    });
+            });
+        }
+        </script> 
+        <div id="map">
+        </div>
+        <div>
+            设备mac:<br>
+            <input type="text" id="macAddr" value="dd3c23d9f3fa"><br>
+            <button onclick="queryDevices()">查询设备轨迹</button><br>
+            <button onclick="queryGateways()">查看网关热度</button><br>
+        </div>
+    </body> 
+</html>
+
