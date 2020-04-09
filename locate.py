@@ -1,7 +1,7 @@
 from math import sqrt
-import pandas as pd 
+import pandas as pd
 import sympy
-import numpy as np 
+import numpy as np
 import itertools
 
 RSSI_threshold = 85
@@ -72,7 +72,7 @@ def three_point(point_list: list):
     return x,y
 
 
-def triposition(xa,ya,da,xb,yb,db,xc,yc,dc): 
+def triposition(xa,ya,da,xb,yb,db,xc,yc,dc):
     x,y = sympy.symbols('x y')
     f1 = 2*x*(xa-xc)+np.square(xc)-np.square(xa)+2*y*(ya-yc)+np.square(yc)-np.square(ya)-(np.square(dc)-np.square(da))
     f2 = 2*x*(xb-xc)+np.square(xc)-np.square(xb)+2*y*(yb-yc)+np.square(yc)-np.square(yb)-(np.square(dc)-np.square(db))
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             temp.append(wifi_y[i])
             temp.append(distance_to_BS(rssi[p][i]))
             point_list.append(temp)
-        
+
         x_2,y_2 = locate_by_pointlist(point_list)
         x_3,y_3 = three_point(point_list)
         print(x_2,y_2,err(x_2,y_2,gt[p]))

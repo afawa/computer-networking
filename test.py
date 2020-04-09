@@ -41,7 +41,7 @@ raw_gd = [["2020/3/28 16:05", 1],
           ["2020/4/7 12:29", 13]]
 gd = {}
 
-
+threshold=85
 def newDis(p1, p2):
     return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
@@ -88,14 +88,10 @@ def lsm(logs):
         print(d[1], 10 ** d[0], distance_to_BS(d[1], a, n))
     plt.scatter(x, y)
     plt.show()
-    # return 54,4
+    #return 54,4
     # return 42,3.3
     return 47.57802543307896, 2.9505452333148887
-    # return 41.58226226202244,3.8300826429963815
-    # return -34.440064131255575,8.822845579966767
-    # return 2.6094699659308254,6.271497715278101
-    # return 2.7977003207279845,46.033336134169005
-    # return a,n
+    #return a,n
 
 
 def plot_img(output):
@@ -103,11 +99,6 @@ def plot_img(output):
     truthY = []
     myX = []
     myY = []
-    '''
-    for item in raw_gd:
-        truthX.append(checkpoint[item[1]][0])
-        truthY.append(checkpoint[item[1]][1])
-    '''
 
     for i in output:
         if i[2] in gd:
@@ -115,8 +106,8 @@ def plot_img(output):
             y = gd[i[2]][1]
             truthX.append(x)
             truthY.append(y)
-            myX.append(i[0])
-            myY.append(i[1])
+        myX.append(i[0])
+        myY.append(i[1])
     print(truthX)
     print(truthY)
     ax = plt.axes(xlim=(0, 42.5), ylim=(0, 29))
@@ -181,7 +172,7 @@ def read_data(file_path_list):
                 for j in range(1, nrows):
                     temp = []
                     rssi = float(sheet.cell(j, 3).value)
-                    if rssi > 85:  # or rssi<60:
+                    if rssi > threshold:  # or rssi<60:
                         continue
                     temp.append(rssi)
                     temp.append(int(sheet.cell(j, 6).value))
@@ -210,10 +201,6 @@ def process_data(raw_list: list, a, n):  # [[rssi, gateway_id, datetime],...]
                 temp.append(t)
         else:
             # 消除重复网关
-            # sum=sum+len(temp)
-            print("\n\n\n**************************")
-            print(now_date)
-            print(temp)
             temp = eliminate_duplicates(temp)
             # 转化格式
             for i in range(len(temp)):
@@ -229,8 +216,6 @@ def process_data(raw_list: list, a, n):  # [[rssi, gateway_id, datetime],...]
     for i in range(len(temp)):
         temp[i] = [gateway[temp[i][0]][0], gateway[temp[i][0]][1], distance_to_BS(temp[i][1], a, n)]
     result[now_date] = temp
-    # print("In process_data:sum=",sum)
-    # print("In process_data:raw_list=",len(raw_list))
     return result  # {datetime:[[gateway_x, gateway_y, distance],...]}
 
 
@@ -247,12 +232,6 @@ def eliminate_duplicates(temp_l):
         result.append([key, sum(value) / len(value)])  # 消除重复的策略可改，这里定的是均值
     print(result)
     return result
-
-    # def plot_image():
-    datList = []
-
-
-#     datMat = mat(datList)
 
 def checkValid(output):
     for point in output:
@@ -272,46 +251,12 @@ def checkValid(output):
 
 
 if __name__ == "__main__":
-    # lsm([])
-    # truth=[[22,6.41,distance(checkpoint[6],gateway[1])],[8.35,22.59,distance(checkpoint[6],gateway[5])],[31.875,2.29,distance(checkpoint[6],gateway[4])]]
-    # predict=[[8.35, 22.59, 22.57317335068112],[31.875, 2.29, 20.97501633691462],[22, 6.41, 17.03514759738794]]
-    # 22,8.35->(18.515832289734426, 10.539951175977802)
-    # 22,31.875->(20.479159264172573, 7.044517856365468)
-    # 8.35,31.875->(20.96037119503746, 11.708361944345995)
-    # xa=predict[0][0]
-    # ya=predict[0][1]
-    # da=predict[0][2]
-
-    # xb=predict[1][0]
-    # yb=predict[1][1]
-    # db=predict[1][2]
-    # x, y = sympy.symbols('x y')
-    # f1 = (x - xa) * (x - xa) + (y - ya) * (y - ya) - da * da
-    # f2 = (x - xb) * (x - xb) + (y - yb) * (y - yb) - db * db
-    # result = sympy.solve([f1, f2], [x, y])
-    # locx, locy = result[x], result[y]
-    # print(locx)
-    # print(locy)
-    # sys.exit(0)
-    # print(truth)
-    # print(predict)
-    # print(locate_by_pointlist(truth))
-    # print(locate_by_pointlist(predict))
-    # print(checkpoint[6])
-    # sys.exit(0)
-    # lsm([])
-    # sys.exit(0)
-    # path =['./data/bkg data/03-28-Abeacon3.csv','./data/bkg data/03-28-mi.csv']
-    path = ['./data/bkg data/03-28-Abeacon3.csv', './data/bkg data/03-28-mi.csv', './data/bkg data/04-07-Abeacon3.xlsx']
+    path = ['./data/bkg data/03-28-Abeacon3.csv', './data/bkg data/03-28-mi.csv']
     result_path = './result/result4.xlsx'
     raw_data, a, n = read_data(path)
     wb = xlwt.Workbook(encoding='utf-8')
     style = xlwt.XFStyle()
     style.num_format_str = 'M/D/YY h:mm'
-    # plt.xlabel('X')
-    # plt.ylabel('Y')
-    # plt.xlim(xmax=45,xmin=0)
-    # plt.ylim(ymax=29,ymin=0)
     output = []
     for key in raw_data.keys():
         sheet = wb.add_sheet(key)
