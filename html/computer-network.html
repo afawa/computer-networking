@@ -115,27 +115,100 @@
             }
 
             //输入macAddress，返回这个address在过去10min钟内的轨迹数组
-            function queryTraceFromMac(macAddress){
-                let url="http://localhost:8010/proxy/device/trace?mac="+macAddress+"&start="+getTimeFromCurrent(10)+"&end="+getTimeFromCurrent(0);
+            /*[{
+                  "x": 7.8977438856596995,
+                  "y": 3.09109512272798,
+                  "location": "7",
+                  "step": 0
+                }]*/
+            function queryTraceFromMac(macAddress,startTime,endTime){
+                let url="http://localhost:8010/proxy/device/trace?mac="+macAddress+"&start="+startTime+"&end="+endTime;
                 var request = new Request(url);
                 fetch(request,{mode: 'cors'})
                     .then(function(response) {
                       res=response.json();
                       res.then(
-                        data=>{});
+                        data=>{
+                            return data.data[0].trace;
+                        });
                   });
             }
 
-            function getDangerousMacY(macX){
+            function getActivityMacList(){
+                let url="http://localhost:8010/proxy/floor/list"
+                var request = new Request(url);
+                fetch(request,{mode: 'cors'})
+                    .then(function(response) {
+                      res=response.json();
+                      res.then(
+                        data=>{
+                            return data.data;
+                        });
+                  });
 
             }
 
-            function judge(macX,macY){
+            function getDangerousMacY(macX){
+                startTime=getTimeFromCurrent(10)
+                endTime=getTimeFromCurrent(0)
+                traceX=queryTraceFromMac(maxX)
+                collectionOfY=getActivityMacList()
+                ret=[]
+                for (let i = 0; i < collectionOfY.length; i++) {
+                    let item=collectionOfY[i]
+                    let macY=item.mac
+                    if(judge(macX,macY).length==2){
+                        ret.push(item)
+                    }
+                }
+                return ret
+            }
 
+            function distance(x1,y1,x2,y2){
+                return Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
+            }
+
+            function judge(macX,macY){
+                startTime=getTimeFromCurrent(10)
+                endTime=getTimeFromCurrent(0)
+                var date = new Date();
+                traceX=queryTraceFromMac(macX,startTime,endTime)
+                traceY=queryTraceFromMac(macY,startTime,endTime)
+                let i;
+                for (i = 0; i < traceX.length; i++) {
+                    point=traceX[i]
+                    if(Math.abs(point.step-traceY[0].step)<60)
+                        break
+                }
+                if(i==traceX.length)
+                    return ["Safe"]
+                let minLen=distance(traceX[i].x,traceX[i].y,traceY[0].x,traceY[0].y)
+                let timeStep=traceX[i].step
+                i=i+1
+                let indexJ=1
+                for (;i<traceX.length;i++,indexJ++){
+                    if(indexJ>=traceY.length)
+                        break
+                    let curDis=distance(traceY[indexJ].x,traceY[indexJ].y,traceX[i].x,traceX[i].y)
+                    if(curDis<minLen){
+                        minLen=curDis
+                        timeStep=traceX[i].step
+                    }
+                }
+                if(minLen>10)
+                    return ["Safe"]
+                else{
+                    date.setSeconds(date.getSeconds()-600+timeStep)
+                    return [minLen,buildFormatTime(date)]
+                }
             }
             function getTimeFromCurrent(timeInMinutes) {
                 var date = new Date();
                 date.setMinutes(date.getMinutes()-timeInMinutes)
+                return buildFormatTime(date);
+            }
+
+            function buildFormatTime(date){
                 var strMonth = date.getMonth() + 1;
                 var strDate = date.getDate();
                 var strHour = date.getHours();
@@ -162,7 +235,6 @@
                         + strHour + '-'
                         + strMin + '-'
                         + strSec;
-                //alert(currentdate);
                 return currentdate;
             }
         </script>
