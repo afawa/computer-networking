@@ -4,13 +4,14 @@
         <meta charset="utf-8">
         <title>HelloWorld</title>
         <style>
-        #map{
+        /* #map{
             background-image:url("./map.png");
-            background-size: cover;
-            width:637.5px;
-            height:435px;
-        }
+            width: 500px;
+            height:400px;
+            background-position: center;
+        } */
     </style>
+    <link rel='stylesheet' type="text/css" href="mystyle.css">
   </head>
     <body>
         <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -238,13 +239,43 @@
                 return currentdate;
             }
         </script>
-        <div id="map">
+        <div style="text-align: center;">
+            <img src="./map.png" width="80%" />
         </div>
-        <div>
-            设备mac:<br>
-            <input type="text" id="macAddr" value="dd3c23d9f3fa"><br>
-            <button onclick="queryDevices()">查询设备轨迹</button><br>
-            <button onclick="queryGateways()">查看网关热度</button><br>
+        <div class="box">
+            <div class="left">
+                批量查询<br>
+            </div>
+            <div class="center">
+                <input type="text" id="macAddr" value="dd3c23d9f3fa"><br>
+            </div>
+            <div class="right">
+                <button onclick="queryDevices()">查询设备轨迹</button><br>
+                <button onclick="queryGateways()">查看网关热度</button><br>
+            </div>
+        </div>
+        <div class="box">
+            <div class="left">
+                点对点查询<br>
+            </div>
+            <div class="center">
+                <input type="text" id="macAddr1" value="输入1"><br>
+                <input type="text" id="macAddr2" value="输入2"><br>
+            </div>
+            <div class="right">
+                <button onclick="queryDevices()">查询设备轨迹</button><br>
+                <button onclick="queryGateways()">查看网关热度</button><br>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <table width='80%' border="1" cellspacing="0" align="center">
+                <thead>
+                    <tr>
+                        <th>可疑macY信息</th>  
+                    </tr>
+                </thead>
+            </table>
         </div>
     </body>
 </html>
