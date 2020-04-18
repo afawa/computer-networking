@@ -1,0 +1,30 @@
+
+.box{
+    width:100%;
+    margin:0 auto;
+    position:relative;
+}
+.box .left{
+    width:30%;
+    height:100px;
+    position:absolute;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 20pt;
+}
+.box .center{
+    height:100px;
+    margin:0 300px 0 200px;
+    margin-top: 10px;
+    font-size: 20pt;
+    text-align: center;
+}
+.box .right{
+    width:40%;
+    height:100px;
+    position:absolute;
+    text-align: center;
+    margin-top: 10px;
+    right:0;
+    top:0;
+}
