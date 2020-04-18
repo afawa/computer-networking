@@ -10,13 +10,13 @@
     position:absolute;
     text-align: center;
     margin-top: 10px;
-    font-size: 20pt;
+    font-size: 15pt;
 }
 .box .center{
     height:100px;
     margin:0 300px 0 200px;
     margin-top: 10px;
-    font-size: 20pt;
+    font-size: 15pt;
     text-align: center;
 }
 .box .right{

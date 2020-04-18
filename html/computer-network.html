@@ -4,12 +4,12 @@
         <meta charset="utf-8">
         <title>HelloWorld</title>
         <style>
-        /* #map{
+        #map{
             background-image:url("./map.png");
             width: 500px;
             height:400px;
             background-position: center;
-        } */
+        }
     </style>
     <link rel='stylesheet' type="text/css" href="mystyle.css">
   </head>
@@ -18,240 +18,20 @@
         <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
         <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
         <script src="http://d3js.org/d3.v4.0.0-alpha.44.min.js"></script>
-        <script>
-            function queryGateways() {
-                let gateways =
-                    [{x:22, y:6.41}, {x:22.62, y:22.59}, {x:41, y:17.4},
-                    {x:31.875, y:2.29}, {x:8.35, y:22.59}, {x:8.15, y:3.31}];
-
-                let width=637.5
-                let height=435
-                d3.select("svg").remove()
-                let svg = d3.select("#map")
-                            .append("svg")
-                            .attr("width", width)
-                            .attr("height", height)
-
-                const colorMap = d3.interpolateRgb(
-                                  d3.rgb('#7CFC00'),
-                                  d3.rgb('#800000')
-                                )
-
-                var request = new Request('http://localhost:8010/proxy/api/gateways');
-                fetch(request,{mode: 'cors'})
-                    .then(function(response) {
-                      res=response.json();
-                      res.then(
-                        data=>{
-                            for (let i = 0; i < data.length; i++) {
-                                gateways[i].number=data[i].connections;
-                             }
-                             let circles = svg.selectAll(".MyCircle")
-                                    .data(gateways)
-                                    .enter()
-                                    .append("circle")
-                                    .attr("class","MyCircle")
-                                    .attr("cx", function(d){
-                                        return d.x*15;
-                                    } )
-                                    .attr("cy",function(d){
-                                        return height-d.y*15;
-                                    })
-                                    .attr("fill", (d)=> {
-                                        return colorMap(d.number)
-                                    })
-                                    .attr("r","8");
-                        });
-                    }).catch(function(error) {
-                      console.log('Request failed', error)
-                    });
-            }
-
-            function queryDevices(){
-                //let url="http://localhost:8010/proxy/api/devices/"+document.getElementById("macAddr").value+"/traces?start_time=2020-04-07%2012:25:00&end_time=2020-04-07%2013:45:00";
-                let url="http://localhost:8010/proxy/device/trace?mac=74:f6:1c:03:c3:a9&start=2020-04-15-16-00-00&end=2020-04-15-16-32-00";
-                var request = new Request(url);
-                fetch(request,{mode: 'cors'})
-                    .then(function(response) {
-                      res=response.json();
-                      res.then(
-                        data=>{
-                            console.log("data:")
-                            console.log(data)
-                            data=data.data[0].trace;
-                            console.log(data)
-                            let points=[]
-                            for (let i = 0; i < data.length; i++) {
-                                if(data[i].x>0.1&&data[i].y>0.1)
-                                    points.push({x:data[i].x*15,y:data[i].y*15});
-                            }
-
-                            //points=[{x:22*15, y:6.41*15}, {x:22.62*15, y:22.59*15}, {x:41*15, y:17.4*15}];
-
-                            let width=637.5
-                            let height=435
-                            d3.select("svg").remove()
-                            let svg = d3.select("#map")
-                                        .append("svg")
-                                        .attr("width", width)
-                                        .attr("height", height)
-                            const line = d3.line()
-                                  .x((d)=> d.x)
-                                  .y((d)=> height - d.y)
-                                  //.curve(d3.curveLinear)
-                                  //.curve(d3.curveNatural)
-                                  //.curve(d3.curveMonotoneX)
-                                  .curve(d3.curveCatmullRom)
-                            console.log(points)
-                            d3.select('svg')
-                              .append("path")
-                              .attr('d', line(points))
-                              .attr('fill', 'none')
-                              .attr('stroke-width',2)
-                              .attr('stroke', 'green');
-                    }).catch(function(error) {
-                      console.log('Request failed', error)
-                    });
-            });
-            }
-
-            //输入macAddress，返回这个address在过去10min钟内的轨迹数组
-            /*[{
-                  "x": 7.8977438856596995,
-                  "y": 3.09109512272798,
-                  "location": "7",
-                  "step": 0
-                }]*/
-            function queryTraceFromMac(macAddress,startTime,endTime){
-                let url="http://localhost:8010/proxy/device/trace?mac="+macAddress+"&start="+startTime+"&end="+endTime;
-                var request = new Request(url);
-                fetch(request,{mode: 'cors'})
-                    .then(function(response) {
-                      res=response.json();
-                      res.then(
-                        data=>{
-                            return data.data[0].trace;
-                        });
-                  });
-            }
-
-            function getActivityMacList(){
-                let url="http://localhost:8010/proxy/floor/list"
-                var request = new Request(url);
-                fetch(request,{mode: 'cors'})
-                    .then(function(response) {
-                      res=response.json();
-                      res.then(
-                        data=>{
-                            return data.data;
-                        });
-                  });
-
-            }
-
-            function getDangerousMacY(macX){
-                startTime=getTimeFromCurrent(10)
-                endTime=getTimeFromCurrent(0)
-                traceX=queryTraceFromMac(maxX)
-                collectionOfY=getActivityMacList()
-                ret=[]
-                for (let i = 0; i < collectionOfY.length; i++) {
-                    let item=collectionOfY[i]
-                    let macY=item.mac
-                    if(judge(macX,macY).length==2){
-                        ret.push(item)
-                    }
-                }
-                return ret
-            }
-
-            function distance(x1,y1,x2,y2){
-                return Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
-            }
-
-            function judge(macX,macY){
-                startTime=getTimeFromCurrent(10)
-                endTime=getTimeFromCurrent(0)
-                var date = new Date();
-                traceX=queryTraceFromMac(macX,startTime,endTime)
-                traceY=queryTraceFromMac(macY,startTime,endTime)
-                let i;
-                for (i = 0; i < traceX.length; i++) {
-                    point=traceX[i]
-                    if(Math.abs(point.step-traceY[0].step)<60)
-                        break
-                }
-                if(i==traceX.length)
-                    return ["Safe"]
-                let minLen=distance(traceX[i].x,traceX[i].y,traceY[0].x,traceY[0].y)
-                let timeStep=traceX[i].step
-                i=i+1
-                let indexJ=1
-                for (;i<traceX.length;i++,indexJ++){
-                    if(indexJ>=traceY.length)
-                        break
-                    let curDis=distance(traceY[indexJ].x,traceY[indexJ].y,traceX[i].x,traceX[i].y)
-                    if(curDis<minLen){
-                        minLen=curDis
-                        timeStep=traceX[i].step
-                    }
-                }
-                if(minLen>10)
-                    return ["Safe"]
-                else{
-                    date.setSeconds(date.getSeconds()-600+timeStep)
-                    return [minLen,buildFormatTime(date)]
-                }
-            }
-            function getTimeFromCurrent(timeInMinutes) {
-                var date = new Date();
-                date.setMinutes(date.getMinutes()-timeInMinutes)
-                return buildFormatTime(date);
-            }
-
-            function buildFormatTime(date){
-                var strMonth = date.getMonth() + 1;
-                var strDate = date.getDate();
-                var strHour = date.getHours();
-                var strMin = date.getMinutes();
-                var strSec = date.getSeconds();
-                if (strMonth >= 1 && strMonth <= 9) {
-                    strMonth = "0" + strMonth;
-                }
-                if (strDate >= 0 && strDate <= 9) {
-                    strDate = "0" + strDate;
-                }
-                if (strHour >= 0 && strHour <= 9) {
-                    strHour = "0" + strHour;
-                }
-                if (strMin >= 0 && strMin <= 9) {
-                    strMin = "0" + strMin;
-                }
-                if (strSec >= 0 && strSec <= 9) {
-                    strSec = "0" + strSec;
-                }
-                var currentdate = date.getFullYear() + '-'
-                        + strMonth + '-'
-                        + strDate + '-'
-                        + strHour + '-'
-                        + strMin + '-'
-                        + strSec;
-                return currentdate;
-            }
-        </script>
+        <script src="./queryMac.js"></script>
         <div style="text-align: center;">
-            <img src="./map.png" width="80%" />
+            <img src="./map.png" width="75%" />
         </div>
         <div class="box">
-            <div class="left">
+            <div class="left" id="myLabel">
                 批量查询<br>
             </div>
             <div class="center">
-                <input type="text" id="macAddr" value="dd3c23d9f3fa"><br>
+                <input type="text" id="macAddr" value="00:13:04:22:99:2f"><br>
             </div>
             <div class="right">
-                <button onclick="queryDevices()">查询设备轨迹</button><br>
-                <button onclick="queryGateways()">查看网关热度</button><br>
+                <button onclick="showMacY()">查询</button><br>
+                <!--button onclick="queryGateways()">查看网关热度</button><br-->
             </div>
         </div>
         <div class="box">
@@ -259,20 +39,20 @@
                 点对点查询<br>
             </div>
             <div class="center">
-                <input type="text" id="macAddr1" value="输入1"><br>
-                <input type="text" id="macAddr2" value="输入2"><br>
+                <input type="text" id="macAddr1" value="Mac Address 1"><br>
+                <input type="text" id="macAddr2" value="Mac Address 2"><br>
             </div>
             <div class="right">
-                <button onclick="queryDevices()">查询设备轨迹</button><br>
-                <button onclick="queryGateways()">查看网关热度</button><br>
+                <button onclick="judge()">查询</button><br>
+                <!--button onclick="queryGateways()">查看网关热度</button><br-->
             </div>
         </div>
 
         <div style="text-align: center;">
-            <table width='80%' border="1" cellspacing="0" align="center">
+            <table width='80%' border="1" cellspacing="0" align="center" id="myTable">
                 <thead>
                     <tr>
-                        <th>可疑macY信息</th>  
+                        <!--th>可疑macY信息</th-->
                     </tr>
                 </thead>
             </table>
