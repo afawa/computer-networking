@@ -4,11 +4,16 @@
         <meta charset="utf-8">
         <title>HelloWorld</title>
         <style>
-        #map{
+        #myMap{
             background-image:url("./map.png");
-            width: 500px;
-            height:400px;
-            background-position: center;
+            background-size: cover;
+            width:637.5px;
+            height:435px;
+            margin: auto;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
     </style>
     <link rel='stylesheet' type="text/css" href="mystyle.css">
@@ -20,14 +25,16 @@
         <script src="http://d3js.org/d3.v4.0.0-alpha.44.min.js"></script>
         <script src="./queryMac.js"></script>
         <div style="text-align: center;">
-            <img src="./map.png" width="75%" />
+            <div id="myMap">
+            </div>
+            <!--img src="./map.png" width="637.5px" height="435px" id="myMap"/-->
         </div>
         <div class="box">
             <div class="left" id="myLabel">
                 批量查询<br>
             </div>
             <div class="center">
-                <input type="text" id="macAddr" value="00:13:04:22:99:2f"><br>
+                <input type="text" id="macAddr" value="28:b4:fb:02:09:14"><br>
             </div>
             <div class="right">
                 <button onclick="showMacY()">查询</button><br>

@@ -46,6 +46,83 @@ function queryGateways() {
         });
 }
 
+function drawPoint (point){
+    let width=637.5
+    let height=435
+    let svg = d3.select("svg")
+    let circles = svg.append("circle")
+            .attr("class","MyCircle")
+            .attr("cx", point[0].x*15)
+            .attr("cy",height-point[0].y*15)
+            .attr("fill", point[0].color)
+            .attr("r","3");
+}
+function drawTrace (trace,color='#8B0000') {
+    //console.log(trace)
+    let points=[]
+    let len=trace.length
+    for (let i = 0; i < len; i++) {
+        points.push({x:trace[i].x*15,y:trace[i].y*15});
+    }
+    for (let i = 0; i <len; i++) {
+        let sumX=points[i].x
+        let sumY=points[i].y
+        let count=1
+        if(i-2>=0){
+            sumX+=points[i-2].x
+            sumY+=points[i-2].y
+            count+=1
+        }
+        if(i-1>=0){
+            sumX+=points[i-1].x
+            sumY+=points[i-1].y
+            count+=1
+        }
+        if(i+1<len){
+            sumX+=points[i+1].x
+            sumY+=points[i+1].y
+            count+=1
+        }
+        if(i+2<len){
+            sumX+=points[i+2].x
+            sumY+=points[i+2].y
+            count+=1
+        }
+        points[i].x=sumX/count
+        points[i].y=sumY/count
+    }
+
+    let width=637.5
+    let height=435
+    let svg;
+    if(color=="#8B0000"){
+        d3.select("svg").remove()
+        svg=d3.select("#myMap")
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+    }
+    else{
+        svg=d3.select("svg")
+    }
+    const line = d3.line()
+          .x((d)=> d.x)
+          .y((d)=> height - d.y)
+          //.curve(d3.curveLinear)
+          .curve(d3.curveNatural)
+          //.curve(d3.curveMonotoneX)
+          //.curve(d3.curveCatmullRom)
+    //console.log(points)
+    d3.select('svg')
+      .append("path")
+      .attr('d', line(points))
+      .attr('fill', 'none')
+      .attr('stroke-width',2)
+      .attr('stroke', color);
+}
+
+
+
 function queryDevices(){
     //let url="http://localhost:8010/proxy/api/devices/"+document.getElementById("macAddr").value+"/traces?start_time=2020-04-07%2012:25:00&end_time=2020-04-07%2013:45:00";
     let url="http://localhost:8010/proxy/device/trace?mac=74:f6:1c:03:c3:a9&start=2020-04-15-16-00-00&end=2020-04-15-16-32-00";
@@ -109,6 +186,7 @@ function queryTraceFromMac(macAddress1,macAddress2){
     let url2="http://localhost:8010/proxy/device/trace?mac="+macAddress2+"&start="+startTime+"&end="+endTime;
     //url1="http://localhost:8010/proxy/device/trace?mac=c5:e1:3b:6b:0c:8f&start=2020-04-15-02-11-00&end=2020-04-15-02-12-00"
     //url2="http://localhost:8010/proxy/device/trace?mac=c5:e1:3b:6b:0c:8f&start=2020-04-15-02-11-00&end=2020-04-15-02-12-00"
+    //url2="http://localhost:8010/proxy/device/trace?mac=74:f6:1c:03:c3:a9&start=2020-04-15-16-00-00&end=2020-04-15-16-32-00";
     var request1 = new Request(url1);
     var request2 = new Request(url2);
     fetch(request1,{mode: 'cors'})
@@ -122,7 +200,9 @@ function queryTraceFromMac(macAddress1,macAddress2){
                       res2=response2.json();
                       res2.then(
                         data2=>{
+                            drawTrace(traceX)
                             let traceY=data2.data[0].trace;
+                            drawTrace (traceY,color='green')
                             _judge(traceX,traceY,date)
                         })
                  })
@@ -156,27 +236,32 @@ function getMacY(macX){
     startTime=getTimeFromCurrent(10)
     endTime=getTimeFromCurrent(0)
     let url1="http://localhost:8010/proxy/device/trace?mac="+macX+"&start="+startTime+"&end="+endTime;
+    //console.log(url1)
     let url2="http://localhost:8010/proxy/floor/list"
+    //url1="http://localhost:8010/proxy/device/trace?mac=74:f6:1c:03:c3:a9&start=2020-04-15-16-00-00&end=2020-04-15-16-32-00";
     var request1 = new Request(url1);
-    var request2 = new Request(url2);
     fetch(request1,{mode: 'cors'})
         .then(function(response1) {
             res1=response1.json();
             res1.then(
                 data1=>{
+                //console.log(data1)
                 let traceX=data1.data[0].trace;
+                //console.log(traceX)
+                var request2 = new Request(url2);
                 fetch(request2,{mode: 'cors'})
                     .then(function(response2) {
                       res2=response2.json();
                       res2.then(
                         data=>{
                             let collectionOfY=data.data;
+                            drawTrace(traceX)
                             getDangerousMacY(collectionOfY,0,traceX,startTime,endTime,date,macX);
                         });
                   })
                     .catch(function(error) {
                       alert("Can't connected to server!", error)
-                    });;
+                    });
             })
         })
         .catch(function(error) {
@@ -249,8 +334,8 @@ function _judge(traceX,traceY,date,macX,macY,x,y,mode="normal"){
         else{
             let minLen=distance(traceX[i].x,traceX[i].y,traceY[0].x,traceY[0].y)
             let timeStep=traceX[i].step
-            let minx;
-            let miny;
+            let minX=traceY[0].x
+            let minY=traceY[0].y
             i=i+1
             let indexJ=1
             for (;i<traceX.length;i++,indexJ++){
@@ -286,12 +371,12 @@ function _judge(traceX,traceY,date,macX,macY,x,y,mode="normal"){
     if(mode=="end"){
         let myTable = document.getElementById("myTable");
         if(myTable.rows.length==1){
-            myTable.deleteRow(i);
+            myTable.deleteRow(0);
             let newTr = myTable.insertRow(myTable.rows.length);
             let newTd0 = newTr.insertCell();
             let newTd1 = newTr.insertCell();
             newTd0.style.background="#00FF7F";
-            newTd1.innerText="设备都在安全距离范围当中";
+            newTd1.innerText="恭喜，没有近距接触者！";
         }
     }
     if(ret.length==1){
@@ -301,7 +386,7 @@ function _judge(traceX,traceY,date,macX,macY,x,y,mode="normal"){
             let newTd0 = newTr.insertCell();
             let newTd1 = newTr.insertCell();
             newTd0.style.background="#00FF7F";
-            newTd1.innerText="两个设备在安全距离范围当中";
+            newTd1.innerText="恭喜，没有近距接触者！";
         }
      }
     else{
@@ -316,10 +401,11 @@ function _judge(traceX,traceY,date,macX,macY,x,y,mode="normal"){
             }
             else{
                 newTr.insertCell().innerText=macY;
-                newTr.insertCell().innerText=minX.toFixed(3);
-                newTr.insertCell().innerText=minY.toFixed(3);
+                newTr.insertCell().innerText=ret[2].toFixed(3);
+                newTr.insertCell().innerText=ret[3].toFixed(3);
                 newTr.insertCell().innerText=ret[1];
                 newTr.insertCell().innerText=ret[0].toFixed(3);
+                drawPoint ([{x:ret[2].toFixed(3),y:ret[3].toFixed(3),color:"#DC143C"}])
             }
         }
         else{
@@ -329,10 +415,11 @@ function _judge(traceX,traceY,date,macX,macY,x,y,mode="normal"){
             }
             else{
                 newTr.insertCell().innerText=macY;
-                newTr.insertCell().innerText=minX.toFixed(3);
-                newTr.insertCell().innerText=minY.toFixed(3);
+                newTr.insertCell().innerText=ret[2].toFixed(3);
+                newTr.insertCell().innerText=ret[3].toFixed(3);
                 newTr.insertCell().innerText=ret[1];
                 newTr.insertCell().innerText=ret[0].toFixed(3);
+                drawPoint ([{x:ret[2].toFixed(3),y:ret[3].toFixed(3),color:"#FFA500"}])
             }
         }
     }
