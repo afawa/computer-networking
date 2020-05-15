@@ -483,3 +483,11 @@ function buildFormatTime(date,flag){
     }
     return currentdate;
 }
+
+function ripple(dom,ev){
+    console.log(ev)
+    var x = ev.offsetX;
+    var y = ev.offsetY;
+    dom.style.setProperty('--x',x+'px');
+    dom.style.setProperty('--y',y+'px');
+  }

@@ -1,57 +1,151 @@
 <!DOCTYPE html>
-<html>
-  <head>
-        <meta charset="utf-8">
-        <title>HelloWorld</title>
-    <link rel='stylesheet' type="text/css" href="mystyle.css">
-  </head>
-    <body>
-        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<html class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<title>网络实习</title>
+		<meta name="description" content="Fullscreen Pageflip Layout with BookBlock" />
+		<meta name="keywords" content="fullscreen pageflip, booklet, layout, bookblock, jquery plugin, flipboard layout, sidebar menu" />
+		<meta name="author" content="Codrops" />
+		<link rel="stylesheet" type="text/css" href="css/jquery.jscrollpane.custom.css" />
+		<link rel="stylesheet" type="text/css" href="css/bookblock.css" />
+		<link rel="stylesheet" type="text/css" href="css/custom.css" />
+		<link rel="stylesheet" type="text/css" href="mystyle.css"/>
+		<script src="js/modernizr.custom.79639.js"></script>
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
         <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
         <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
         <script src="http://d3js.org/d3.v4.0.0-alpha.44.min.js"></script>
         <script src="./queryMac.js"></script>
-        <div style="text-align: center;">
-            <div id="myMap">
-            </div>
-            <!--img src="./map.png" width="637.5px" height="435px" id="myMap"/-->
-        </div>
-        <div class="box">
-            <div class="left" id="myLabel">
-                批量查询<br>
-            </div>
-            <div class="center">
-                <input type="text" id="macAddr" value="28:b4:fb:02:09:14"><br>
-            </div>
-            <div class="right">
-                <button onclick="showMacY()">查询</button><br>
-                <!--button onclick="queryGateways()">查看网关热度</button><br-->
-            </div>
-        </div>
-        <div class="box">
-            <div class="left">
-                点对点查询<br>
-            </div>
-            <div class="center">
-                <input type="text" id="macAddr1" value="Mac Address 1"><br>
-                <input type="text" id="macAddr2" value="Mac Address 2"><br>
-            </div>
-            <div class="right">
-                <button onclick="judge()">查询</button><br>
-                <!--button onclick="queryGateways()">查看网关热度</button><br-->
-            </div>
-        </div>
+	</head>
+	<body>
+		<div id="container" class="container">	
 
-        <div style="text-align: center;">
-            <table width='80%' border="1" cellspacing="0" align="center" id="myTable">
-                <thead>
-                    <tr>
-                        <!--th>可疑macY信息</th-->
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </body>
+			<div class="menu-panel">
+				<h3>网络实习</h3>
+				<ul id="menu-toc" class="menu-toc">
+					<li class="menu-toc-current"><a href="#item1">批量查询</a></li>
+					<li><a href="#item2">点对点查询</a></li>
+				</ul>
+			</div>
+
+			<div class="bb-custom-wrapper">
+				<div id="bb-bookblock" class="bb-bookblock">
+					<div class="bb-item" id="item1">
+						<div class="content">
+							<div class="scroller">
+								<h2>批量查询</h2>
+								<div id="myMap">
+								</div>
+								<!--img src="./map.png" width="637.5px" height="435px" id="myMap"/-->
+								<div class="box">
+									<span class="input input--haruki">
+										<input class="input__field input__field--haruki" type="text" id="macAddr" />
+										<label class="input__label input__label--haruki" for="input-1">
+											<span class="input__label-content input__label-content--haruki">MAC地址</span>
+										</label>
+									</span>
+									<span class="input input--haruki">
+										<input class="input__field input__field--haruki" type="text" id="Start Time" />
+										<label class="input__label input__label--haruki" for="input-1">
+											<span class="input__label-content input__label-content--haruki">开始时间</span>
+										</label>
+									</span>
+									<span class="input input--haruki">
+										<input class="input__field input__field--haruki" type="text" id="End Time" />
+										<label class="input__label input__label--haruki" for="input-1">
+											<span class="input__label-content input__label-content--haruki">结束时间</span>
+										</label>
+									</span> <br>
+										<!-- <input type="text" id="macAddr" value="28:b4:fb:02:09:14"><br> -->
+										<label class="btn" tabindex="1">
+											<input type="checkbox"><span onclick="ripple(this,event),showMacY()">查询</span>
+										</label>
+										<!-- <button onclick="showMacY()">查询</button><br> -->
+										<!--button onclick="queryGateways()">查看网关热度</button><br-->
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="bb-item" id="item2">
+						<div class="content">
+							<div class="scroller">
+								<h2>点对点查询</h2>
+								<div class="box">
+									<span class="input input--haruki">
+										<input class="input__field input__field--haruki" type="text" id="macAddr1" />
+										<label class="input__label input__label--haruki" for="input-1">
+											<span class="input__label-content input__label-content--haruki">MAC地址1</span>
+										</label>
+									</span>
+									<span class="input input--haruki">
+										<input class="input__field input__field--haruki" type="text" id="macAddr2" />
+										<label class="input__label input__label--haruki" for="input-1">
+											<span class="input__label-content input__label-content--haruki">MAC地址2</span>
+										</label>
+									</span> <br>
+									<label class="btn" tabindex="1">
+										<input type="checkbox"><span onclick="ripple(this,event),judge()">查询</span>
+									</label>
+										<!-- <button onclick="judge()">查询</button><br> -->
+										<!--button onclick="queryGateways()">查看网关热度</button><br-->
+									<table Align="center">
+										<colgroup>
+											<col span="1">
+											<col style="width: 300px;">
+										</colgroup>
+										<tr>
+											<th>可疑macY信息</th>
+										</tr>
+										<tr>
+											<td>嘤嘤嘤</td>
+											
+										</tr>
+										<tr>
+											<td>呜呜呜</td>
+											
+										</tr>
+										<tr>
+											<td>喵喵喵</td>
+											
+										</tr>
+										<tr>
+											<td>略略略</td>
+											
+										</tr>
+									</table>
+								</div>
+
+
+							</div>
+						</div>
+					</div>
+					
+				</div>
+				
+				<nav>
+					<span id="bb-nav-prev">&larr;</span>
+					<span id="bb-nav-next">&rarr;</span>
+				</nav>
+
+				<span id="tblcontents" class="menu-button">Table of Contents</span>
+
+			</div>
+				
+		</div><!-- /container -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script src="js/jquery.mousewheel.js"></script>
+		<script src="js/jquery.jscrollpane.min.js"></script>
+		<script src="js/jquerypp.custom.js"></script>
+		<script src="js/jquery.bookblock.js"></script>
+		<script src="js/page.js"></script>
+		<script>
+			$(function() {
+
+				Page.init();
+
+			});
+		</script>
+	</body>
 </html>
-
-
