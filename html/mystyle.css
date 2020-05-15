@@ -30,7 +30,18 @@
     top:0;
 }
 
-#myMap{
+#myMap1{
+    background-image:url("./newMap.png");
+    background-size: cover;
+    width:637.5px;
+    height:435px;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+#myMap2{
     background-image:url("./newMap.png");
     background-size: cover;
     width:637.5px;
@@ -44,9 +55,9 @@
 
 .btn {
 	display: block;
-	width: 1000px;
+	width: 60%;
 	margin: 50px;
-	left: 18%;
+	left: 20%;
 	outline: 0;
 	overflow: hidden;
 	position: relative;
@@ -118,7 +129,7 @@
 	z-index: 1;
 	display: inline-block;
 	margin: 1em;
-	max-width: 400px;
+	max-width: 20%;
 	width: calc(100% - 2em);
 	vertical-align: top;
 }

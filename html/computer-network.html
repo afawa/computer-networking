@@ -36,7 +36,7 @@
 						<div class="content">
 							<div class="scroller">
 								<h2>批量查询</h2>
-								<div id="myMap">
+								<div id="myMap1">
 								</div>
 								<!--img src="./map.png" width="637.5px" height="435px" id="myMap"/-->
 								<div class="box">
@@ -64,6 +64,31 @@
 										</label>
 										<!-- <button onclick="showMacY()">查询</button><br> -->
 										<!--button onclick="queryGateways()">查看网关热度</button><br-->
+									<table Align="center">
+										<colgroup>
+											<col span="1">
+											<col style="width: 300px;">
+										</colgroup>
+										<tr>
+											<th>可疑macY信息</th>
+										</tr>
+										<tr>
+											<td>嘤嘤嘤</td>
+											
+										</tr>
+										<tr>
+											<td>呜呜呜</td>
+											
+										</tr>
+										<tr>
+											<td>喵喵喵</td>
+											
+										</tr>
+										<tr>
+											<td>略略略</td>
+											
+										</tr>
+									</table>
 								</div>
 							</div>
 						</div>
@@ -72,6 +97,8 @@
 						<div class="content">
 							<div class="scroller">
 								<h2>点对点查询</h2>
+								<div id="myMap2">
+								</div>
 								<div class="box">
 									<span class="input input--haruki">
 										<input class="input__field input__field--haruki" type="text" id="macAddr1" />
@@ -84,7 +111,20 @@
 										<label class="input__label input__label--haruki" for="input-1">
 											<span class="input__label-content input__label-content--haruki">MAC地址2</span>
 										</label>
-									</span> <br>
+									</span> 
+									<span class="input input--haruki">
+										<input class="input__field input__field--haruki" type="text" id="Start Time1" />
+										<label class="input__label input__label--haruki" for="input-1">
+											<span class="input__label-content input__label-content--haruki">开始时间</span>
+										</label>
+									</span>
+									<span class="input input--haruki">
+										<input class="input__field input__field--haruki" type="text" id="End Time1" />
+										<label class="input__label input__label--haruki" for="input-1">
+											<span class="input__label-content input__label-content--haruki">结束时间</span>
+										</label>
+									</span>
+									<br>
 									<label class="btn" tabindex="1">
 										<input type="checkbox"><span onclick="ripple(this,event),judge()">查询</span>
 									</label>
