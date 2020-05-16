@@ -57,71 +57,73 @@ function drawPoint (point){
             .attr("fill", point[0].color)
             .attr("r","3");
 }
-function drawTrace (trace,color='#8B0000') {
-    //console.log(trace)
-    let points=[]
-    let len=trace.length
-    for (let i = 0; i < len; i++) {
-        points.push({x:trace[i].x*15,y:trace[i].y*15});
-    }
-    for (let i = 0; i <len; i++) {
-        let sumX=points[i].x
-        let sumY=points[i].y
-        let count=1
-        if(i-2>=0){
-            sumX+=points[i-2].x
-            sumY+=points[i-2].y
-            count+=1
-        }
-        if(i-1>=0){
-            sumX+=points[i-1].x
-            sumY+=points[i-1].y
-            count+=1
-        }
-        if(i+1<len){
-            sumX+=points[i+1].x
-            sumY+=points[i+1].y
-            count+=1
-        }
-        if(i+2<len){
-            sumX+=points[i+2].x
-            sumY+=points[i+2].y
-            count+=1
-        }
-        points[i].x=sumX/count
-        points[i].y=sumY/count
-    }
 
-    let width=637.5
-    let height=435
-    let svg;
-    if(color=="#8B0000"){
-        d3.select("svg").remove()
-        svg=d3.select("#myMap")
-                    .append("svg")
-                    .attr("width", width)
-                    .attr("height", height)
-    }
-    else{
-        svg=d3.select("svg")
-    }
-    const line = d3.line()
-          .x((d)=> d.x)
-          .y((d)=> height - d.y)
-          //.curve(d3.curveLinear)
-          .curve(d3.curveNatural)
-          //.curve(d3.curveMonotoneX)
-          //.curve(d3.curveCatmullRom)
-    //console.log(points)
-    d3.select('svg')
-      .append("path")
-      .attr('d', line(points))
-      .attr('fill', 'none')
-      .attr('stroke-width',2)
-      .attr('stroke', color);
+function drawTrace (mac,startTime,endTime,color='#8B0000') {
+    let url="http://localhost:8010/proxy/device/trace?start="+
+    startTime+"&end="+endTime+"&mac="+mac;
+    var request = new Request(url);
+    fetch(request,{mode: 'cors'})
+        .then(function(response) {
+          res=response.json();
+          res.then(
+            data=>{
+                let trace=data.data[0].trace;
+                //console.log(trace)
+                if(trace.length==1){
+                    drawPoint([{x:trace[0].x,y:trace[0].y,color:color}])
+                }
+                let points=[]
+                let len=trace.length
+                for (let i = 0; i < len; i++) {
+                    points.push({x:trace[i].x*15,y:trace[i].y*15});
+                }
+                for (let i = 0; i <len; i++) {
+                    let sumX=points[i].x
+                    let sumY=points[i].y
+                    let count=1
+                    if(i-2>=0){
+                        sumX+=points[i-2].x
+                        sumY+=points[i-2].y
+                        count+=1
+                    }
+                    if(i-1>=0){
+                        sumX+=points[i-1].x
+                        sumY+=points[i-1].y
+                        count+=1
+                    }
+                    if(i+1<len){
+                        sumX+=points[i+1].x
+                        sumY+=points[i+1].y
+                        count+=1
+                    }
+                    if(i+2<len){
+                        sumX+=points[i+2].x
+                        sumY+=points[i+2].y
+                        count+=1
+                    }
+                    points[i].x=sumX/count
+                    points[i].y=sumY/count
+                }
+
+                let width=637.5
+                let height=435
+                const line = d3.line()
+                      .x((d)=> d.x)
+                      .y((d)=> height - d.y)
+                      //.curve(d3.curveLinear)
+                      .curve(d3.curveNatural)
+                      //.curve(d3.curveMonotoneX)
+                      //.curve(d3.curveCatmullRom)
+                //console.log(points)
+                d3.select('svg')
+                  .append("path")
+                  .attr('d', line(points))
+                  .attr('fill', 'none')
+                  .attr('stroke-width',2)
+                  .attr('stroke', color);
+            })
+        })
 }
-
-
 
 function queryDevices(){
     //let url="http://localhost:8010/proxy/api/devices/"+document.getElementById("macAddr").value+"/traces?start_time=2020-04-07%2012:25:00&end_time=2020-04-07%2013:45:00";
@@ -295,6 +297,7 @@ function getDangerousMacY(collectionOfY,idx,traceX,startTime,endTime,date,macX){
         });
     }
 }
+
 function distance(x1,y1,x2,y2){
     return Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
 }
@@ -311,6 +314,7 @@ function showMacY(){
     let macX=document.getElementById("macAddr").value
     getMacY(macX)
 }
+
 function _judge(traceX,traceY,date,macX,macY,x,y,mode="normal"){
     let i;
     let ret=[]
@@ -428,7 +432,7 @@ function _judge(traceX,traceY,date,macX,macY,x,y,mode="normal"){
 function judge(){
     let myTable = document.getElementById("myTable");
     var rowNum=myTable.rows.length;
-     for (i=0;i<rowNum;i++){
+    for (i=0;i<rowNum;i++){
          myTable.deleteRow(i);
          rowNum=rowNum-1;
          i=i-1;
@@ -437,6 +441,7 @@ function judge(){
     let mac2=document.getElementById("macAddr2").value
     queryTraceFromMac(mac1,mac2)
 }
+
 function getTimeFromCurrent(timeInMinutes) {
     var date = new Date();
     date.setMinutes(date.getMinutes()-timeInMinutes)
@@ -485,9 +490,189 @@ function buildFormatTime(date,flag){
 }
 
 function ripple(dom,ev){
-    console.log(ev)
+    //console.log(ev)
     var x = ev.offsetX;
     var y = ev.offsetY;
     dom.style.setProperty('--x',x+'px');
     dom.style.setProperty('--y',y+'px');
   }
+
+function timeFormatter(time){
+    let timeList=time.split('-');
+    if(timeList.length==6)
+        return timeList[0]+"-"+timeList[1]+"-"+timeList[2]+" "+timeList[3]+":"+timeList[4]+":"+timeList[5];
+    else
+        return timeList[0]+"-"+timeList[1]+"-"+timeList[2]+":"+timeList[3];
+}
+
+function initialize(pageNumber){
+    let width="637.5px";
+    let height="435px";
+    d3.select("svg").remove()
+    svg=d3.select("#myMap"+pageNumber)
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+    let myTable = document.getElementById("myTable1");
+    var rowNum=myTable.rows.length;
+    for (let i=0;i<rowNum;i++)
+    {
+         myTable.deleteRow(i);
+         rowNum=rowNum-1;
+         i=i-1;
+    }
+    myTable = document.getElementById("myTable2");
+    rowNum=myTable.rows.length;
+    for (let i=0;i<rowNum;i++)
+    {
+         myTable.deleteRow(i);
+         rowNum=rowNum-1;
+         i=i-1;
+    }
+}
+
+function queryTwoMac(){
+    let mac1=document.getElementById("macAddr1").value
+    let mac2=document.getElementById("macAddr2").value
+    let startTime=document.getElementById("Start_Time1").value //2020-04-25-19-40-00
+    let endTime=document.getElementById("End_Time1").value //2020-04-25-19-45-00
+    //startTime="2020-04-25-19-40-00"
+    //endTime="2020-04-25-19-45-00"
+    //mac1="01:27:ac:b0:4c:26"
+    //mac2="51:2a:71:ad:d1:45"
+    let url="http://localhost:8010/proxy/device/detection_single?start="+
+    startTime+"&end="+endTime+"&mac="+mac1+"&target="+mac2;
+    initialize("2");
+    drawTrace(mac1,startTime,endTime)
+    drawTrace(mac2,startTime,endTime,color='green')
+    var request = new Request(url);
+    fetch(request,{mode: 'cors'})
+        .then(function(response) {
+          res=response.json();
+          res.then(
+            data=>{
+                let detectRes=data.data;
+                let alarmPos=[]
+                for(let i=0;i<detectRes.length;++i){
+                    if(detectRes[i].distance<=10)
+                        alarmPos.push(detectRes[i])
+                }
+                if(alarmPos.length==0){
+                    let th=["警报级别","详细信息"]
+                    let myTable = document.getElementById("myTable2");
+                    let newTr = myTable.insertRow(myTable.rows.length);
+                    for(let i=0;i<th.length;++i){
+                        let newTd=newTr.insertCell();
+                        newTd.innerText=th[i];
+                        newTd.style="font-weight:bold";
+                    }
+
+                    newTr = myTable.insertRow(myTable.rows.length);
+                    newTd = newTr.insertCell();
+                    newTd.innerText="安全";
+                    newTd.style.color="#00CD00";
+                    newTd.style.width="50%";
+                    newTr.insertCell().innerText="恭喜,两个设备无近距离接触记录！";
+                }
+                else{
+                    let th=["警报级别","时间","两个设备距离"]
+                    let myTable = document.getElementById("myTable2");
+                    let newTr = myTable.insertRow(myTable.rows.length);
+                    for(let i=0;i<th.length;++i){
+                        let newTd=newTr.insertCell();
+                        newTd.innerText=th[i];
+                        newTd.style="font-weight:bold";
+                    }
+                    for(let i=0;i<alarmPos.length;++i){
+                        newTr = myTable.insertRow(myTable.rows.length);
+                        if(alarmPos[i].distance<=5){
+                            newTd = newTr.insertCell();
+                            newTd.innerText="危险";
+                            newTd.style.color="#DC143C";
+                        }
+                        else{
+                            newTd = newTr.insertCell();
+                            newTd.innerText="警报";
+                            newTd.style.color="#EE7942";
+                        }
+                        newTr.insertCell().innerText=timeFormatter(alarmPos[i].eventTime);
+                        newTr.insertCell().innerText=alarmPos[i].distance.toFixed(3)+"m";
+                    }
+                }
+            });
+      })
+    .catch(function(error) {
+      alert("Can't connected to server!", error)
+    });
+}
+
+function queryOneMac(){
+    let mac=document.getElementById("macAddr").value
+    let startTime=document.getElementById("Start_Time").value //2020-04-25-19-40-00
+    let endTime=document.getElementById("End_Time").value //2020-04-25-19-45-00
+    //startTime="2020-04-25-19-40-00"
+    //endTime="2020-04-25-19-45-00"
+    //mac="01:27:ac:b0:4c:26"
+    let url="http://localhost:8010/proxy/device/detection?start="+
+    startTime+"&end="+endTime+"&mac="+mac;
+    var request = new Request(url);
+    initialize("1")
+    drawTrace(mac,startTime,endTime)
+    fetch(request,{mode: 'cors'})
+        .then(function(response) {
+          res=response.json();
+          res.then(
+            data=>{
+                let alarmPos=data.data;
+                if(alarmPos.length==0){
+                    let th=["警报级别","详细信息"]
+                    let myTable = document.getElementById("myTable1");
+                    let newTr = myTable.insertRow(myTable.rows.length);
+                    for(let i=0;i<th.length;++i){
+                        let newTd=newTr.insertCell();
+                        newTd.innerText=th[i];
+                        newTd.style="font-weight:bold";
+                    }
+
+                    newTr = myTable.insertRow(myTable.rows.length);
+                    newTd = newTr.insertCell();
+                    newTd.innerText="安全";
+                    newTd.style.color="#00CD00";
+                    newTd.style.width="50%";
+                    newTr.insertCell().innerText="恭喜,无近距离接触者！";
+                }
+                else{
+                    let th=["警报级别","可疑mac地址","可疑mac横坐标","可疑mac纵坐标","时间","两个设备距离"]
+                    let myTable = document.getElementById("myTable1");
+                    let newTr = myTable.insertRow(myTable.rows.length);
+                    for(let i=0;i<th.length;++i){
+                        let newTd=newTr.insertCell();
+                        newTd.innerText=th[i];
+                        newTd.style="font-weight:bold";
+                    }
+                    for(let i=0;i<alarmPos.length;++i){
+                        newTr = myTable.insertRow(myTable.rows.length);
+                        if(alarmPos[i].distance<=5){
+                            newTd = newTr.insertCell();
+                            newTd.innerText="危险";
+                            newTd.style.color="#DC143C";
+                            drawPoint ([{x:alarmPos[i].x,y:alarmPos[i].y,color:"#DC143C"}]);
+                        }
+                        else{
+                            newTd = newTr.insertCell();
+                            newTd.innerText="警报";
+                            newTd.style.color="#EE7942";
+                            drawPoint ([{x:alarmPos[i].x,y:alarmPos[i].y,color:"#EE7942"}]);
+                        }
+                        newTr.insertCell().innerText=alarmPos[i].mac;
+                        newTr.insertCell().innerText=alarmPos[i].x.toFixed(3);
+                        newTr.insertCell().innerText=alarmPos[i].y.toFixed(3);
+                        newTr.insertCell().innerText=timeFormatter(alarmPos[i].eventTime);
+                        newTr.insertCell().innerText=alarmPos[i].distance.toFixed(3)+"m";
+                    }
+                }
+            }
+          )
+        }
+    )
+}
