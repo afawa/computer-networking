@@ -41,53 +41,34 @@
 								<!--img src="./map.png" width="637.5px" height="435px" id="myMap"/-->
 								<div class="box">
 									<span class="input input--haruki">
-										<input class="input__field input__field--haruki" type="text" id="macAddr" />
+										<input class="input__field input__field--haruki" type="text" id="macAddr" value="01:27:ac:b0:4c:26"/>
 										<label class="input__label input__label--haruki" for="input-1">
 											<span class="input__label-content input__label-content--haruki">MAC地址</span>
 										</label>
 									</span>
 									<span class="input input--haruki">
-										<input class="input__field input__field--haruki" type="text" id="Start Time" />
+										<input class="input__field input__field--haruki" type="text" id="Start_Time" value="2020-04-25-19-40-00"/>
 										<label class="input__label input__label--haruki" for="input-1">
 											<span class="input__label-content input__label-content--haruki">开始时间</span>
 										</label>
 									</span>
 									<span class="input input--haruki">
-										<input class="input__field input__field--haruki" type="text" id="End Time" />
+										<input class="input__field input__field--haruki" type="text" id="End_Time" value="2020-04-25-19-45-00" />
 										<label class="input__label input__label--haruki" for="input-1">
 											<span class="input__label-content input__label-content--haruki">结束时间</span>
 										</label>
 									</span> <br>
 										<!-- <input type="text" id="macAddr" value="28:b4:fb:02:09:14"><br> -->
 										<label class="btn" tabindex="1">
-											<input type="checkbox"><span onclick="ripple(this,event),showMacY()">查询</span>
+											<input type="checkbox"><div onclick="ripple(this,event),queryOneMac()">查询</div>
 										</label>
 										<!-- <button onclick="showMacY()">查询</button><br> -->
 										<!--button onclick="queryGateways()">查看网关热度</button><br-->
-									<table Align="center">
+									<table Align="center" id="myTable1">
 										<colgroup>
 											<col span="1">
 											<col style="width: 300px;">
 										</colgroup>
-										<tr>
-											<th>可疑macY信息</th>
-										</tr>
-										<tr>
-											<td>嘤嘤嘤</td>
-											
-										</tr>
-										<tr>
-											<td>呜呜呜</td>
-											
-										</tr>
-										<tr>
-											<td>喵喵喵</td>
-											
-										</tr>
-										<tr>
-											<td>略略略</td>
-											
-										</tr>
 									</table>
 								</div>
 							</div>
@@ -101,59 +82,40 @@
 								</div>
 								<div class="box">
 									<span class="input input--haruki">
-										<input class="input__field input__field--haruki" type="text" id="macAddr1" />
+										<input class="input__field input__field--haruki" type="text" id="macAddr1" value="01:27:ac:b0:4c:26"/>
 										<label class="input__label input__label--haruki" for="input-1">
 											<span class="input__label-content input__label-content--haruki">MAC地址1</span>
 										</label>
 									</span>
 									<span class="input input--haruki">
-										<input class="input__field input__field--haruki" type="text" id="macAddr2" />
+										<input class="input__field input__field--haruki" type="text" id="macAddr2" value="51:2a:71:ad:d1:45"/>
 										<label class="input__label input__label--haruki" for="input-1">
 											<span class="input__label-content input__label-content--haruki">MAC地址2</span>
 										</label>
 									</span> 
 									<span class="input input--haruki">
-										<input class="input__field input__field--haruki" type="text" id="Start Time1" />
+										<input class="input__field input__field--haruki" type="text" id="Start_Time1" value="2020-04-25-19-40-00" />
 										<label class="input__label input__label--haruki" for="input-1">
 											<span class="input__label-content input__label-content--haruki">开始时间</span>
 										</label>
 									</span>
 									<span class="input input--haruki">
-										<input class="input__field input__field--haruki" type="text" id="End Time1" />
+										<input class="input__field input__field--haruki" type="text" id="End_Time1" value="2020-04-25-19-45-00"/>
 										<label class="input__label input__label--haruki" for="input-1">
 											<span class="input__label-content input__label-content--haruki">结束时间</span>
 										</label>
 									</span>
 									<br>
 									<label class="btn" tabindex="1">
-										<input type="checkbox"><span onclick="ripple(this,event),judge()">查询</span>
+										<input type="checkbox"><span onclick="ripple(this,event),queryTwoMac()">查询</span>
 									</label>
 										<!-- <button onclick="judge()">查询</button><br> -->
 										<!--button onclick="queryGateways()">查看网关热度</button><br-->
-									<table Align="center">
+									<table Align="center" id="myTable2">
 										<colgroup>
 											<col span="1">
 											<col style="width: 300px;">
 										</colgroup>
-										<tr>
-											<th>可疑macY信息</th>
-										</tr>
-										<tr>
-											<td>嘤嘤嘤</td>
-											
-										</tr>
-										<tr>
-											<td>呜呜呜</td>
-											
-										</tr>
-										<tr>
-											<td>喵喵喵</td>
-											
-										</tr>
-										<tr>
-											<td>略略略</td>
-											
-										</tr>
 									</table>
 								</div>
 
