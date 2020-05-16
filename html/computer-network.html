@@ -17,7 +17,9 @@
         <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
         <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
         <script src="http://d3js.org/d3.v4.0.0-alpha.44.min.js"></script>
-        <script src="./queryMac.js"></script>
+		<script src="./queryMac.js"></script>
+		<script src="js/classie.js"></script>
+
 	</head>
 	<body>
 		<div id="container" class="container">	
@@ -25,8 +27,6 @@
 			<div class="menu-panel">
 				<h3>网络实习</h3>
 				<ul id="menu-toc" class="menu-toc">
-					<li class="menu-toc-current"><a href="#item1">批量查询</a></li>
-					<li><a href="#item2">点对点查询</a></li>
 				</ul>
 			</div>
 
@@ -186,6 +186,41 @@
 				Page.init();
 
 			});
+		</script>
+		<script>
+			(function() {
+				// trim polyfill : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
+				if (!String.prototype.trim) {
+					(function() {
+						// Make sure we trim BOM and NBSP
+						var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
+						String.prototype.trim = function() {
+							return this.replace(rtrim, '');
+						};
+					})();
+				}
+
+				[].slice.call( document.querySelectorAll( 'input.input__field' ) ).forEach( function( inputEl ) {
+					// in case the input is already filled..
+					if( inputEl.value.trim() !== '' ) {
+						classie.add( inputEl.parentNode, 'input--filled' );
+					}
+
+					// events:
+					inputEl.addEventListener( 'focus', onInputFocus );
+					inputEl.addEventListener( 'blur', onInputBlur );
+				} );
+
+				function onInputFocus( ev ) {
+					classie.add( ev.target.parentNode, 'input--filled' );
+				}
+
+				function onInputBlur( ev ) {
+					if( ev.target.value.trim() === '' ) {
+						classie.remove( ev.target.parentNode, 'input--filled' );
+					}
+				}
+			})();
 		</script>
 	</body>
 </html>
