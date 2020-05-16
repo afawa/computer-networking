@@ -111,7 +111,7 @@ def plot_img(output):
     print(truthX)
     print(truthY)
     ax = plt.axes(xlim=(0, 42.5), ylim=(0, 29))
-    imgP = plt.imread('./data/bkg data/map.png')
+    imgP = plt.imread('./data/bkg data/newMap.png')
     ax.imshow(imgP, zorder=0, extent=[0, 42.5, 0.0, 29])  # 背景图片
     ax.scatter(truthX, truthY, marker='+', s=150, c='r')
     ax.scatter(myX, myY, marker='*', s=15, c='b')
