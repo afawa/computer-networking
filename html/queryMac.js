@@ -606,6 +606,109 @@ function queryTwoMac(){
     });
 }
 
+function detection(ret,start,end,macY,index,macX){
+    let url="http://localhost:8010/proxy/device/detection_single?start="+
+    start+"&end="+end+"&mac="+macY[index].DeviceMAC+"&target="+macX;
+    var request = new Request(url);
+    console.log(url)
+    fetch(request,{mode: 'cors'})
+        .then(function(response) {
+          res=response.json();
+          res.then(
+            data=>{
+                console.log(data.data);
+                if(data.data.length!=0){
+                    let start=0;
+                    while((start<data.data.length)&&(data.data[start].distance==null)){
+                       console.log(data.data[start].distance)
+                       start++;
+                    }
+                    if(start!=data.data.length){
+                        let choose=start;
+                        let minDis=data.data[start].distance;
+                        for(let i=start+1;i<data.data.length;++i){
+                            if(data.data[i].distance==null)
+                                continue;
+                            if(data.data[i].x==null)
+                                continue;
+                            if(data.data[i].y==null)
+                                continue;
+                            if(data.data[i].distance<minDis){
+                                minDis=data.data[i].distance;
+                                choose=i;
+                            }
+                        }
+                        tmp=data.data[choose]
+                        if(tmp.distance<=10){
+                            tmp.mac=macY[index].DeviceMAC
+                            ret.push(tmp);
+                            if(tmp.distance<=5){
+                                drawPoint ([{x:tmp.x,y:tmp.y,color:"#DC143C"}]);
+                            }
+                            else{
+                                drawPoint ([{x:tmp.x,y:tmp.y,color:"#EE7942"}]);
+                            }
+                        }
+                    }
+                }
+                if(index+1!=macY.length)
+                    detection(ret,start,end,macY,index+1,macX);
+                else
+                    detection_show(ret);
+            })})
+}
+
+function detection_show(alarmPos){
+    console.log(alarmPos)
+    if(alarmPos.length==0){
+        let th=["警报级别","详细信息"]
+        let myTable = document.getElementById("myTable1");
+        let newTr = myTable.insertRow(myTable.rows.length);
+        for(let i=0;i<th.length;++i){
+            let newTd=newTr.insertCell();
+            newTd.innerText=th[i];
+            newTd.style="font-weight:bold";
+        }
+
+        newTr = myTable.insertRow(myTable.rows.length);
+        newTd = newTr.insertCell();
+        newTd.innerText="安全";
+        newTd.style.color="#00CD00";
+        newTd.style.width="50%";
+        newTr.insertCell().innerText="恭喜,无近距离接触者！";
+    }
+    else{
+        let th=["警报级别","可疑mac地址","可疑mac横坐标","可疑mac纵坐标","时间","两个设备距离"]
+        let myTable = document.getElementById("myTable1");
+        let newTr = myTable.insertRow(myTable.rows.length);
+        for(let i=0;i<th.length;++i){
+            let newTd=newTr.insertCell();
+            newTd.innerText=th[i];
+            newTd.style="font-weight:bold";
+        }
+        for(let i=0;i<alarmPos.length;++i){
+            newTr = myTable.insertRow(myTable.rows.length);
+            if(alarmPos[i].distance<=5){
+                newTd = newTr.insertCell();
+                newTd.innerText="危险";
+                newTd.style.color="#DC143C";
+                //drawPoint ([{x:alarmPos[i].x,y:alarmPos[i].y,color:"#DC143C"}]);
+            }
+            else{
+                newTd = newTr.insertCell();
+                newTd.innerText="警报";
+                newTd.style.color="#EE7942";
+                //drawPoint ([{x:alarmPos[i].x,y:alarmPos[i].y,color:"#EE7942"}]);
+            }
+            newTr.insertCell().innerText=alarmPos[i].mac;
+            newTr.insertCell().innerText=alarmPos[i].x.toFixed(3);
+            newTr.insertCell().innerText=alarmPos[i].y.toFixed(3);
+            newTr.insertCell().innerText=timeFormatter(alarmPos[i].eventTime);
+            newTr.insertCell().innerText=alarmPos[i].distance.toFixed(3)+"m";
+        }
+    }
+}
+
 function queryOneMac(){
     let mac=document.getElementById("macAddr").value
     let startTime=document.getElementById("Start_Time").value //2020-04-25-19-40-00
@@ -613,8 +716,11 @@ function queryOneMac(){
     //startTime="2020-04-25-19-40-00"
     //endTime="2020-04-25-19-45-00"
     //mac="01:27:ac:b0:4c:26"
-    let url="http://localhost:8010/proxy/device/detection?start="+
-    startTime+"&end="+endTime+"&mac="+mac;
+    //let url="http://localhost:8010/proxy/device/detection?start="+
+    //startTime+"&end="+endTime+"&mac="+mac;
+    let url="http://localhost:8010/proxy/device/neighbor?mac="+
+    mac+"&start="+startTime+"&end="+endTime+"&limit=10&rssi=80"
+    console.log(url)
     var request = new Request(url);
     initialize("1")
     drawTrace(mac,startTime,endTime)
@@ -623,54 +729,8 @@ function queryOneMac(){
           res=response.json();
           res.then(
             data=>{
-                let alarmPos=data.data;
-                if(alarmPos.length==0){
-                    let th=["警报级别","详细信息"]
-                    let myTable = document.getElementById("myTable1");
-                    let newTr = myTable.insertRow(myTable.rows.length);
-                    for(let i=0;i<th.length;++i){
-                        let newTd=newTr.insertCell();
-                        newTd.innerText=th[i];
-                        newTd.style="font-weight:bold";
-                    }
-
-                    newTr = myTable.insertRow(myTable.rows.length);
-                    newTd = newTr.insertCell();
-                    newTd.innerText="安全";
-                    newTd.style.color="#00CD00";
-                    newTd.style.width="50%";
-                    newTr.insertCell().innerText="恭喜,无近距离接触者！";
-                }
-                else{
-                    let th=["警报级别","可疑mac地址","可疑mac横坐标","可疑mac纵坐标","时间","两个设备距离"]
-                    let myTable = document.getElementById("myTable1");
-                    let newTr = myTable.insertRow(myTable.rows.length);
-                    for(let i=0;i<th.length;++i){
-                        let newTd=newTr.insertCell();
-                        newTd.innerText=th[i];
-                        newTd.style="font-weight:bold";
-                    }
-                    for(let i=0;i<alarmPos.length;++i){
-                        newTr = myTable.insertRow(myTable.rows.length);
-                        if(alarmPos[i].distance<=5){
-                            newTd = newTr.insertCell();
-                            newTd.innerText="危险";
-                            newTd.style.color="#DC143C";
-                            drawPoint ([{x:alarmPos[i].x,y:alarmPos[i].y,color:"#DC143C"}]);
-                        }
-                        else{
-                            newTd = newTr.insertCell();
-                            newTd.innerText="警报";
-                            newTd.style.color="#EE7942";
-                            drawPoint ([{x:alarmPos[i].x,y:alarmPos[i].y,color:"#EE7942"}]);
-                        }
-                        newTr.insertCell().innerText=alarmPos[i].mac;
-                        newTr.insertCell().innerText=alarmPos[i].x.toFixed(3);
-                        newTr.insertCell().innerText=alarmPos[i].y.toFixed(3);
-                        newTr.insertCell().innerText=timeFormatter(alarmPos[i].eventTime);
-                        newTr.insertCell().innerText=alarmPos[i].distance.toFixed(3)+"m";
-                    }
-                }
+                console.log(data.data);
+                detection([],startTime,endTime,data.data,0,mac);
             }
           )
         }
