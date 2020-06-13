@@ -111,7 +111,7 @@ def check_multi_gateway(processed_data):
 
 
 if __name__ == "__main__":
-    data_path = './data/bkg data/04-07-Abeacon3.csv'
+    data_path = './data/data/04-07-Abeacon3.csv'
     # data_list=read_data(data_path=data_path)
     # processed_data=process_data(data_list,5)
     # processed_data = rssi2distance(processed_data,0)

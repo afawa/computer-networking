@@ -141,11 +141,7 @@ def cal_error(x):
 
 
 if __name__ == "__main__":
-    #x = pd.read_csv(open('D:\\边凯归\\蓝牙定位\\数据\\第四组\\test2.csv'))
-    #data_xls = pd.read_excel('./data/bkg data/04-07-Abeacon3.xlsx')
-    #data_xls.to_csv('./data/bkg data/04-07-Abeacon3.csv', encoding='utf-8')
-    #sys.exit(0)
-    x = pd.read_csv(open('data/bkg data/04-07-Abeacon3.csv'))
+    x = pd.read_csv(open('data/data/04-07-Abeacon3.csv'))
     result = dataprocess(x)
     x1, y1, x2, y2 = [], [], [], []
     X, Y = result.shape
@@ -160,4 +156,3 @@ if __name__ == "__main__":
     result = pd.concat([result, df], axis=1)
     result.loc[:, 'error'] = result.apply(cal_error, axis=1)
     print(result)
-    #result.to_csv('D:\\边凯归\\蓝牙定位\\数据\\第四组\\result1.csv')

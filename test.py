@@ -20,7 +20,7 @@ restriction = [8.862, 32.1915, 9.729, 18.523]  # left,right,bottom,top
 time_window = 1  # min
 
 raw_gd = [["2020/3/28 16:05", 1],
-          ["2020/3/28 16:39", 6],
+          #["2020/3/28 16:39", 6],
           ["2020/3/28 16:44", 11],
           ["2020/3/28 16:49", 10],
           ["2020/3/28 17:10", 12],
@@ -35,7 +35,7 @@ raw_gd = [["2020/3/28 16:05", 1],
           ["2020/4/7 11:44", 7],
           ["2020/4/7 11:50", 8],
           ["2020/4/7 11:56", 9],
-          ["2020/4/7 12:03", 10],
+          #["2020/4/7 12:03", 10],
           ["2020/4/7 12:14", 11],
           ["2020/4/7 12:23", 12],
           ["2020/4/7 12:29", 13]]
@@ -111,7 +111,7 @@ def plot_img(output):
     print(truthX)
     print(truthY)
     ax = plt.axes(xlim=(0, 42.5), ylim=(0, 29))
-    imgP = plt.imread('./data/bkg data/newMap.png')
+    imgP = plt.imread('./data/data/map.png')
     ax.imshow(imgP, zorder=0, extent=[0, 42.5, 0.0, 29])  # 背景图片
     ax.scatter(truthX, truthY, marker='+', s=150, c='r')
     ax.scatter(myX, myY, marker='*', s=15, c='b')
@@ -251,7 +251,7 @@ def checkValid(output):
 
 
 if __name__ == "__main__":
-    path = ['./data/bkg data/03-28-Abeacon3.csv', './data/bkg data/03-28-mi.csv']
+    path = ['./data/data/03-28-Abeacon3.csv', './data/data/03-28-mi.csv','./data/data/04-07-Abeacon3.xlsx']
     result_path = './result/result4.xlsx'
     raw_data, a, n = read_data(path)
     wb = xlwt.Workbook(encoding='utf-8')
